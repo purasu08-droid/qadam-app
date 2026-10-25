@@ -43,6 +43,10 @@ export default function Header() {
   const links = [
     { to: '/#categories', label: 'Категории', active: onLanding && location.hash === '#categories' },
     { to: '/map', label: 'Карта', active: location.pathname === '/map' },
+    ...(desktop ? [
+      { to: '/pricing', label: 'Тарифы', active: location.pathname === '/pricing' },
+      { to: '/campus', label: 'Campus', active: location.pathname.startsWith('/campus') },
+    ] : []),
     { to: '/#faq', label: 'FAQ', active: onLanding && location.hash === '#faq' },
   ]
   return (
@@ -67,7 +71,7 @@ export default function Header() {
             <Link to="/create" className="btn lime sm desktop-create"><Plus size={16} /> {t("Создать")}</Link>
             <div className="dd">
               <button ref={userButton} className="me-btn" aria-label={t("Меню профиля")} aria-expanded={menu === 'user'} aria-controls="profile-options" onClick={() => setMenu(menu === 'user' ? null : 'user')}><Avatar src={user.avatar} letter={user.name[0]} size={42} />{state.unread > 0 && <i className="dot" aria-label={t('Непрочитанных: {count}', {count:state.unread})} />}<ChevronDown size={16} /></button>
-              {menu === 'user' && <div id="profile-options" className="dd-menu right"><div className="dd-head"><b>{user.name}</b><span>{user.role || user.email}</span></div><Link to={desktop ? '/profile' : '/account/profile'}><User size={16} />{t("Профиль")}</Link><Link to="/projects"><FolderKanban size={16} />{t("Мои проекты")}</Link><Link to="/chats"><MessageCircle size={16} />{t("Чаты")} {state.unread > 0 && <i className="count">{state.unread}</i>}</Link><button disabled={loggingOut} onClick={() => { void logout() }}><LogOut size={16} />{loggingOut ? t("Выходим…") : t("Выйти")}</button>{logoutError && <p className="err logout-error" role="alert">{t("Не удалось выйти.")} {t(logoutError)}</p>}</div>}
+              {menu === 'user' && <div id="profile-options" className="dd-menu right"><div className="dd-head"><b>{user.name}</b><span>{user.role || user.email}</span></div><Link to={desktop ? '/profile' : '/account/profile'}><User size={16} />{t("Профиль")}</Link><Link to="/projects"><FolderKanban size={16} />{t("Мои проекты")}</Link><Link to="/chats"><MessageCircle size={16} />{t("Чаты")} {state.unread > 0 && <i className="count">{state.unread}</i>}</Link>{desktop && <><Link to="/campus">{t("Кабинет Qadam Campus")}</Link><Link to="/pricing">{t("Тарифы")}</Link></>}<button disabled={loggingOut} onClick={() => { void logout() }}><LogOut size={16} />{loggingOut ? t("Выходим…") : t("Выйти")}</button>{logoutError && <p className="err logout-error" role="alert">{t("Не удалось выйти.")} {t(logoutError)}</p>}</div>}
             </div>
           </> : ready ? <Link to={desktop ? '/signin' : '/account/signin'} className="btn lime sm" state={{ from: location.pathname + location.search + location.hash }}>{t("Войти")}</Link> : <span className="muted small" role="status">{t("Вход…")}</span>}
         </div>

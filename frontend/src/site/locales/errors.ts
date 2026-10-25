@@ -34,4 +34,15 @@ export const errors: TranslationCatalog = {
     en: 'The publication created by this request has been deleted. Retrying the request will not recreate it.',
   },
 
+
+  'Сервер не вернул кабинет демо-университета. Повтори вход.': {
+    kk: 'Сервер демо-университет кабинетін қайтармады. Қайта кіріп көр.',
+    en: 'The server did not return the demo university dashboard. Try signing in again.',
+  },
+  'Выбери свою публикацию для продвижения': { kk: 'Ілгерілету үшін өз жарияланымыңды таңда', en: 'Choose one of your publications to promote' },
+  'Продвигать можно только свою публикацию': { kk: 'Тек өз жарияланымыңды ілгерілетуге болады', en: 'You can only promote your own publication' },
+  'Бесплатная публикация за этот месяц уже использована. Оплата пока недоступна; сохрани черновик.': {
+    kk: 'Осы айдың тегін жарияланымы пайдаланылған. Төлем әзірге қолжетімсіз; нобайды сақта.',
+    en: 'Your free publication for this month has been used. Payment is not available yet; save a draft.',
+  },
 }

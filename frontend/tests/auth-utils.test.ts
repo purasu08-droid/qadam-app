@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { safeReturnPath, siteAuthReturnPath } from '../src/site/auth-utils'
+import { campusDemoPath, safeReturnPath, siteAuthReturnPath } from '../src/site/auth-utils'
 
 test('auth return keeps an internal route, query and fragment', () => {
   assert.equal(safeReturnPath('/chats/c_123?filter=unread#latest'), '/chats/c_123?filter=unread#latest')
@@ -56,4 +56,20 @@ test('server sign-in preserves valid profile and API return destinations with qu
   for (const destination of ['https://external.example', '/\\external.example', '/%E0%A4%A', null, { from: '/account' }]) {
     assert.equal(siteAuthReturnPath(destination, '/account/signin'), '/account/profile')
   }
+})
+
+test('web Campus sign-in has a safe university return destination without allowing sign-in loops', () => {
+  for (const destination of ['/campus/signin', '/CAMPUS/SIGNIN/', '/campus/%73ignin', '/%63ampus/signin', '/campus%2Fsignin/', '/campus/signin%2F', '/profile/../campus/signin#again']) {
+    assert.equal(safeReturnPath(destination), '/', destination)
+    assert.equal(siteAuthReturnPath(destination, '/campus/signin'), '/campus', destination)
+  }
+  assert.equal(siteAuthReturnPath(null, '/campus/signin'), '/campus')
+  assert.equal(siteAuthReturnPath('/campus/campus_1?tab=students#pending', '/campus/signin'), '/campus/campus_1?tab=students#pending')
+  assert.equal(siteAuthReturnPath('/account/signin', '/campus/signin'), '/campus')
+  assert.equal(siteAuthReturnPath('/campus/signin', '/account/signin'), '/account/profile')
+})
+
+test('web demo tenant ids cannot insert another route, query, fragment or parent segment', () => {
+  assert.equal(campusDemoPath('demo/id?tab=grants#old'), '/campus/demo%2Fid%3Ftab%3Dgrants%23old')
+  for (const value of ['', ' ', '.', '..', 'a\nb']) assert.throws(() => campusDemoPath(value))
 })

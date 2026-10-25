@@ -17,5 +17,7 @@ export const config = {
   seedDemoData: process.env.SEED_DEMO_DATA === 'true' || (!production && process.env.SEED_DEMO_DATA !== 'false'),
   // Production requires HTTPS unless local HTTP is explicitly requested.
   cookieSecure: process.env.COOKIE_SECURE === 'true' || (production && process.env.COOKIE_SECURE !== 'false'),
+  // The pilot displays future prices while every publication remains free.
+  billingMode: process.env.BILLING_MODE === 'enforced' ? 'enforced' as const : 'preview' as const,
   frontendDist: resolve(ROOT, '../frontend/dist'),
 }

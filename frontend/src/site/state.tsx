@@ -2,7 +2,8 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState, ty
 import { advanceApiSession, api, isAbortError, subscribeUnauthorized, type MeState, type NewPublication, type Profile } from './api'
 import { CITIES, type Opportunity } from './data'
 import { createAuthSequencer } from './auth-session'
-import type { AuthOptions } from './auth-types'
+import { campusDemoPath } from './auth-utils'
+import type { AuthOptions, CampusDemoSession } from './auth-types'
 
 type SiteState = {
   ready: boolean
@@ -19,6 +20,7 @@ type SiteState = {
   signIn: (email: string, password: string) => Promise<void>
   signUp: (name: string, email: string, password: string) => Promise<void>
   demoSignIn: () => Promise<void>
+  demoCampusSignIn: (beforeCommit?: (destination: string) => void) => Promise<string>
   signOut: () => Promise<void>
   setUser: (p: Profile) => void
 
@@ -153,7 +155,7 @@ export function SiteProvider({ children }: { children: ReactNode }) {
     try {
       const result = await api.get<AuthOptions>('/auth/options')
       if (request !== optionsRequest.current) return
-      setAuthOptions({ demoLogin: result.demoLogin === true })
+      setAuthOptions({ demoLogin: result.demoLogin === true, campusDemoLogin: result.campusDemoLogin === true })
     } catch (error) {
       if (request === optionsRequest.current) setAuthOptionsError((error as Error).message)
     } finally {
@@ -251,6 +253,14 @@ export function SiteProvider({ children }: { children: ReactNode }) {
     signIn: (email, password) => auth('/auth/login', { email, password }),
     signUp: (name, email, password) => auth('/auth/register', { name, email, password, city }),
     demoSignIn: () => auth('/auth/demo'),
+    demoCampusSignIn: async (beforeCommit) => {
+      let destination = '/campus'
+      await transitionAuth(() => api.post<CampusDemoSession>('/auth/campus-demo'), (result) => result.user, (result) => {
+        destination = campusDemoPath(result.campus.id)
+        beforeCommit?.(destination)
+      })
+      return destination
+    },
     signOut: async () => {
       await transitionAuth(() => api.post('/auth/logout'), () => null)
     },

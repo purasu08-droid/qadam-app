@@ -37,7 +37,7 @@
 :root[data-theme='light'] .site :is(.sb-q svg, .sb-city svg, .tb-search svg, .cr-input label svg) { color: var(--dim); }
 :root[data-theme='light'] .site :is(.fld input, .fld textarea, .select select, .input-icon input, .tb-search input, .cr-input input, .seg.full) { background: #ffffff; }
 :root[data-theme='light'] .site :is(.select option, .sb-city option) { background: #ffffff; color: var(--text); }
-:root[data-theme='light'] .site :is(.fld input, .fld textarea, .select select, .input-icon input, .tb-search input, .cr-input input) { border-color: #82916f; }
+:root[data-theme='light'] .site :is(.fld input, .fld textarea, .select select, .input-icon input, .tb-search input, .cr-input input, .campus-select select, .campus-grant-form select, .campus-enroll select, .campus-search) { border-color: #82916f; }
 :root[data-theme='light'] .site :is(.fld input:focus, .fld textarea:focus, .select select:focus, .input-icon input:focus, .tb-search input:focus, .cr-input input:focus) { border-color: var(--purple); }
 :root[data-theme='light'] .site .fld .bad { border-color: var(--red); }
 :root[data-theme='light'] .site :is(.chip, .itile.plain, .type, .file, .status.s-done) { background: var(--panel-2); }
@@ -46,8 +46,8 @@
 :root[data-theme='light'] .site .btn.lime.done { background: #e8f1d9; color: var(--lime); }
 :root[data-theme='light'] .site .chip.ghost { background: transparent; }
 :root[data-theme='light'] .site .chip.on { background: var(--lime); color: var(--lime-ink); }
-:root[data-theme='light'] .site :is(.chip.purple.outline, .term, .purple-sub) { color: var(--purple); }
-:root[data-theme='light'] .site .chip.lime { color: var(--lime); background: #f0f6e4; border-color: #aabe87; }
+:root[data-theme='light'] .site :is(.chip.purple.outline, .term, .purple-sub, .pricing-table tbody .pricing-student-col) { color: var(--purple); }
+:root[data-theme='light'] .site :is(.chip.lime, .billing-pilot) { color: var(--lime); background: #f0f6e4; border-color: #aabe87; }
 :root[data-theme='light'] .site .link-purple:hover { color: #4c278f; }
 :root[data-theme='light'] .site .err { color: var(--red); }
 :root[data-theme='light'] .site :is(.radio, .status.s-done) { color: var(--dim); border-color: var(--line-2); }
@@ -65,6 +65,9 @@
 :root[data-theme='light'] .site .api-down { border-color: #e2a5ad; background: #fff0f1; color: #9f2032; }
 :root[data-theme='light'] .site .api-down code { color: #9f2032; }
 :root[data-theme='light'] .site .modal-back { background: rgba(33, 42, 24, .42); }
+:root[data-theme='light'] .site .campus-feedback.error { border-color: #e2a5ad; background: #fff0f1; color: #9f2032; }
+:root[data-theme='light'] .site .campus-status.pending { border-color: #dbba7d; background: #fff7e6; color: #855108; }
+:root[data-theme='light'] .site :is(.campus-status.rejected, .campus-status.revoked) { color: var(--purple); }
 
 /* The light hero uses its own artwork; uploaded photos elsewhere keep their colours. */
 :root[data-theme='light'] .site .landing .hero { background: #f6f7f2; border-color: #b4bfa4; }

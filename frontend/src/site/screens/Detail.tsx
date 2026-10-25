@@ -8,6 +8,7 @@ import { api } from '../api'
 import { formatEventDate, KINDS, type Opportunity, type Role } from '../data'
 import { useApi, useSite } from '../state'
 import { Avatar, Cover, KindBadge } from '../components/ui'
+import { PromotionPreview } from '../components/Billing'
 import { useI18n } from '../i18n'
 import { useIsDesktop } from '../../useIsDesktop'
 
@@ -27,11 +28,12 @@ export default function Detail() {
 }
 
 function Crumbs({ o, backFirst }: { o: Opportunity; backFirst?: boolean }) {
+  const desktop = useIsDesktop()
   const { t } = useI18n()
   const list = `/map?kind=${o.kind}&view=list`
   const back = <Link to={list} className="back"><ArrowLeft size={17} /> {t(BACK[o.kind])}</Link>
   const path = <span className="crumb-path"><Link to={list}>{t(KINDS[o.kind].plural)}</Link> / <span>{o.title}</span></span>
-  return <div className="crumbs">{backFirst ? <>{back}<span className="sep">/</span>{path}</> : <>{path}{back}</>}</div>
+  return <><div className="crumbs">{backFirst ? <>{back}<span className="sep">/</span>{path}</> : <>{path}{back}</>}</div>{desktop && o.campus && <section className="panel billing-summary" aria-label={t('Публикация Qadam Campus')}><p className="muted small">Qadam Campus · {o.campus.name}</p>{o.campusHidden && <p className="err" role="status">{t('Публикация скрыта администратором вуза и не видна на карте. Причина: {reason}. По вопросам обратись в свой вуз.', { reason: o.moderationReason || t('не указана') })}</p>}</section>}</>
 }
 
 function EventView({ o }: { o: Opportunity }) {
@@ -103,6 +105,7 @@ function EventView({ o }: { o: Opportunity }) {
             </button>
             {error ? <p className="err center">{t(error)}</p> : <p className="muted small center">{t(going ? 'Организатор знает, что ты придёшь' : 'Можно передумать в любой момент')}</p>}
           </div>
+          {desktop && !!user && user.id === o.author?.id && <PromotionPreview opportunityId={o.id} />}
         </aside>
       </div>
     </div>
@@ -259,6 +262,7 @@ function ProjectView({ o }: { o: Opportunity }) {
               </>
             )}
           </form>
+          {desktop && mine && <PromotionPreview opportunityId={o.id} />}
           {author && (
             <div className="panel author">
               <b>{t(AUTHOR_OF[o.kind])}</b>

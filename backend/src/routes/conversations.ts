@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { me, param, requireAuth } from '../auth.js'
 import { all, get, newId, now, run } from '../db.js'
 import { findPerson, opportunityOf, type OpportunityRow } from '../models.js'
-import { canReadOpportunity } from '../legacy-data.js'
+import { canReadOpportunity } from '../campus.js'
 
 export const conversationsRouter = Router()
 conversationsRouter.use(requireAuth)

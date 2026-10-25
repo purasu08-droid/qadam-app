@@ -1,13 +1,17 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { ApiError, type NewPublication } from '../api'
 import { ArrowLeft, ArrowRight, CalendarDays, Camera, Check, ChevronDown, FileText, MapPin, Plus, X } from 'lucide-react'
 import { CITIES, KIND_ORDER, KINDS, type Kind } from '../data'
-import { useSite } from '../state'
+import { useApi, useSite } from '../state'
 import { KindBadge, KindIcon, kindStyle } from '../components/ui'
 import LocationPicker from '../components/LocationPicker'
-import { isPublicationReplay, newPublicationKey, publicationAttempt, readPublicationAttempt } from '../publication-attempt'
+import { PublicationBilling } from '../components/Billing'
+import type { CampusMe } from '../campus-types'
+import { canSubmitPublication, publicationButtonText, type BillingQuote } from '../billing'
+import { incompatiblePublicationAttempt, isPublicationReplay, newPublicationKey, publicationAttempt, readPublicationAttempt } from '../publication-attempt'
 import { useI18n } from '../i18n'
+import { useIsDesktop } from '../../useIsDesktop'
 
 const DIRECTIONS = ['AI / Разработка', 'Дизайн', 'Образование', 'Экология', 'Игры', 'Спорт', 'Бизнес']
 const STAGES = ['Идея', 'Прототип', 'MVP', 'Рост']
@@ -15,6 +19,7 @@ const SIZES = ['2 участника', '3 участника', '5 участни
 const COVERS = ['/img/preview-chip.jpg', '/img/thumb-floppy.jpg', '/img/cover-campus.jpg', '/img/cover-study.jpg']
 
 type Draft = {
+  campusId?: string
   kind: Kind
   title: string
   direction: string
@@ -55,12 +60,13 @@ function loadDraft(key: string, city: string): Draft {
   try {
     const raw = localStorage.getItem(key)
     const parsed = raw ? JSON.parse(raw) : {}
-    const fields = parsed && typeof parsed === 'object' ? Object.fromEntries(Object.entries(parsed).filter(([field]) => Object.keys(EMPTY).includes(field) || field === 'coords')) : {}
+    const fields = parsed && typeof parsed === 'object' ? Object.fromEntries(Object.entries(parsed).filter(([field]) => Object.keys(EMPTY).includes(field) || field === 'coords' || field === 'campusId')) : {}
     const d = { ...EMPTY, city, ...fields }
     if (!KIND_ORDER.includes(d.kind) || !CITIES.some((c) => c.name === d.city) || !Array.isArray(d.roles) || d.roles.some((r: unknown) => typeof r !== 'string')) return { ...EMPTY, city }
     for (const key of ['title', 'description', 'direction', 'stage', 'size', 'deadline', 'date', 'startTime', 'endTime', 'place'] as const) if (typeof d[key] !== 'string') d[key] = EMPTY[key]
     d.cover = Number.isInteger(d.cover) && d.cover >= 0 && d.cover < COVERS.length ? d.cover : 0
     d.online = d.online === true
+    if (typeof d.campusId !== 'string' || !d.campusId.trim()) d.campusId = undefined
     if (!Array.isArray(d.coords) || d.coords.length !== 2 || !d.coords.every((n: unknown) => typeof n === 'number' && Number.isFinite(n)) || Math.abs(d.coords[0]) > 90 || Math.abs(d.coords[1]) > 180) d.coords = undefined
     return d
   } catch {
@@ -69,29 +75,31 @@ function loadDraft(key: string, city: string): Draft {
 }
 
 export default function Create() {
+  const desktop = useIsDesktop()
   const { t, locale } = useI18n()
   const nav = useNavigate()
   const { publish, user, city } = useSite()
+  const pricing = useApi<BillingQuote>(desktop ? '/billing/quote?service=publication' : null)
+  const campus = useApi<CampusMe>(desktop ? '/campus/me' : null)
   const draftKey = `qadam.site.draft.${user!.id}`
   const attemptKey = `qadam.site.publication-attempt.${user!.id}`
   const [initialAttempt] = useState(() => readPublicationAttempt(attemptKey))
   const requestAttempt = useRef(initialAttempt)
-  const [closedAttempt, setClosedAttempt] = useState(() => {
-    if (!initialAttempt) return false
-    try {
-      const previous: unknown = JSON.parse(initialAttempt.payload)
-      return !!previous && typeof previous === 'object' && 'campusId' in previous
-    } catch { return true }
-  })
+  const [attemptRejected, setAttemptRejected] = useState(false)
   const [d, setD] = useState<Draft>(() => loadDraft(draftKey, city))
+  const closedAttempt = attemptRejected || incompatiblePublicationAttempt(requestAttempt.current, desktop, d.campusId)
   const payload: NewPublication = {
     kind: d.kind, title: d.title.trim(), description: d.description.trim(), direction: d.direction,
     stage: d.kind === 'idea' ? d.stage : '', city: d.city, online: d.online, roles: d.roles,
     size: d.size, deadline: d.deadline, cover: COVERS[d.cover],
+    ...(desktop && d.campusId ? { campusId: d.campusId } : {}),
     ...(d.kind === 'event' ? { date: d.date, time: `${d.startTime}–${d.endTime}`, place: d.place.trim(), coords: d.coords } : {}),
   }
   const pendingReplay = isPublicationReplay(requestAttempt.current, payload)
-  const canSubmit = !closedAttempt
+  const membership = campus.data?.membership
+  const canPostToCampus = !!membership?.current && membership.status === 'verified'
+  const campusAllowed = !d.campusId || (canPostToCampus && membership?.campus.id === d.campusId)
+  const canSubmit = !closedAttempt && (!desktop || ((pendingReplay || campusAllowed) && canSubmitPublication(pricing.data, pricing.error, pendingReplay)))
   const active = useRef(true)
   useEffect(() => { active.current = true; return () => { active.current = false } }, [])
   const [savedAt, setSavedAt] = useState<Date | null>(null)
@@ -127,15 +135,19 @@ export default function Create() {
   const resetAttempt = () => {
     requestAttempt.current = null
     try { localStorage.removeItem(attemptKey) } catch { /* storage unavailable */ }
-    setClosedAttempt(false)
+    setAttemptRejected(false)
     setError(null)
+    if (desktop) pricing.reload()
   }
   const submit = async (e: FormEvent) => {
     e.preventDefault()
     if (submitting.current) return
     setTried(true)
     if (!valid) return setError(event ? 'Заполни название, описание, участников, дату, время окончания позже начала, адрес и точку на карте.' : 'Заполни название, описание (от 10 символов) и хотя бы одну роль')
-    if (!canSubmit) return
+    if (closedAttempt) return
+    if (desktop && !pendingReplay && (!pricing.data || pricing.error)) return setError('Не удалось проверить стоимость. Повтори расчёт ниже.')
+    if (desktop && !pendingReplay && !campusAllowed) return setError('Для размещения в Campus нужно действующее подтверждение вуза. Обнови статус или отключи размещение в Campus.')
+    if (!canSubmit) return setError('Оплата пока недоступна. Сохрани черновик, чтобы вернуться позже.')
     submitting.current = true
     setError(null)
     setBusy(true)
@@ -158,8 +170,9 @@ export default function Create() {
       if (active.current) {
         setError((err as Error).message)
         setBusy(false)
-        if (err instanceof ApiError && (err.status === 409 || err.status === 410)) setClosedAttempt(true)
+        if (err instanceof ApiError && (err.status === 409 || err.status === 410)) setAttemptRejected(true)
       }
+      if (desktop) pricing.reload()
     } finally {
       submitting.current = false
     }
@@ -266,11 +279,25 @@ export default function Create() {
             </>}
           </section>
 
+          {desktop && <>
+            <section className="panel billing-summary" aria-label={t('Размещение в Qadam Campus')}>
+              <div className="row between"><h2>Qadam Campus</h2><Link to="/campus" className="link-purple">{t('Мой Campus')} <ArrowRight size={16} /></Link></div>
+              {(canPostToCampus || d.campusId) ? <>
+                <label className="row"><input type="checkbox" checked={!!d.campusId} onChange={(e) => set('campusId', e.target.checked ? membership?.campus.id : undefined)} disabled={busy || (!canPostToCampus && !d.campusId)} /><span>{t('Разместить в Campus {campus}', { campus: membership?.campus.name ?? '' })}</span></label>
+                <p className="muted small">{t('Администраторы вуза смогут видеть эту публикацию в кабинете и скрывать её с указанием причины. Без этого выбора публикация остаётся личной.')}</p>
+                {!campusAllowed && <p className="err" role="status">{t('Подтверждение вуза больше не действует или ещё загружается. Отключи размещение в Campus либо обнови статус.')}</p>}
+              </> : <p className="muted small">{t('Для размещения в пространстве вуза подай заявку в Campus и получи подтверждение. Личную публикацию можно создать сейчас.')}</p>}
+              {campus.error && <p className="err" role="status">{t('Не удалось проверить статус Campus.')} {t(campus.error)}</p>}
+              <button type="button" className="link-purple" onClick={campus.reload}>{t('Обновить статус Campus')}</button>
+            </section>
+            <PublicationBilling quote={pricing.data} error={pricing.error} retry={pricing.reload} />
+          </>}
+
           <section className="panel actions">
             {closedAttempt ? <div role="status"><p className="muted small">{t('Эту попытку нельзя повторить. Проверь «Мои проекты» перед новой отправкой: она создаст отдельную публикацию.')}</p><button type="button" className="link-purple" onClick={resetAttempt}>{t('Начать новую отправку')}</button></div> : pendingReplay && <p className="muted small" role="status">{t('Предыдущая отправка могла завершиться. Проверим её результат с защитой от дублирования публикации.')}</p>}
             <div className="two">
               <button type="button" className="btn outline-purple lg" onClick={saveDraft}>{t(savedAt ? 'Черновик сохранён' : 'Сохранить черновик')}</button>
-              <button type="submit" className="btn lime lg" disabled={busy || !canSubmit}>{t(busy ? 'Публикуем…' : pendingReplay ? 'Проверить результат отправки' : 'Опубликовать')} <ArrowRight size={18} /></button>
+              <button type="submit" className="btn lime lg" disabled={busy || !canSubmit}>{t(busy ? 'Публикуем…' : desktop ? publicationButtonText(pricing.data, pendingReplay) : pendingReplay ? 'Проверить результат отправки' : 'Опубликовать')} <ArrowRight size={18} /></button>
             </div>
             {error ? <p className="err" role="alert">{t(error)}</p> : <p className="muted small"><i className="req">*</i> {t('Обязательные поля')}</p>}
           </section>

@@ -5,8 +5,8 @@ import { all, get, newId, now, run, tx } from '../db.js'
 import { opportunityOf, type OpportunityRow } from '../models.js'
 import { CITY_COORDS } from '../seed-data.js'
 import { ensureDirect, postMessage } from './conversations.js'
-import { createPublication, publicationPayloadHash } from '../publication-requests.js'
-import { canReadOpportunity, publicOpportunityVisibility } from '../legacy-data.js'
+import { createPublicationWithBilling, publicationPayloadHash } from '../billing.js'
+import { bindCampusPublication, canReadOpportunity, publicCampusVisibility } from '../campus.js'
 
 export const opportunitiesRouter = Router()
 
@@ -22,7 +22,7 @@ const Query = z.object({
 
 opportunitiesRouter.get('/', (req, res) => {
   const f = Query.parse(req.query)
-  const where: string[] = [publicOpportunityVisibility()]
+  const where: string[] = [publicCampusVisibility()]
   const params: string[] = []
   if (f.city) where.push('city = ?'), params.push(f.city)
   if (f.kind) where.push('kind = ?'), params.push(f.kind)
@@ -65,6 +65,7 @@ const Create = z.object({
   place: z.string().trim().min(2).max(300).optional(),
   coords: z.tuple([z.number().finite().min(-90).max(90), z.number().finite().min(-180).max(180)]).optional(),
   cover: z.string().startsWith('/img/').max(200).optional(),
+  campusId: z.string().trim().min(1).max(100).optional(),
 }).superRefine((value, ctx) => {
   if (value.kind !== 'event') return
   for (const field of ['date', 'time', 'place', 'coords'] as const) {
@@ -84,7 +85,7 @@ opportunitiesRouter.post('/', requireAuth, (req, res) => {
   const roles = d.roles.map((r) => ({ title: r, text: d.direction, tags: d.stage ? [d.stage] : [], icon: /разраб|dev|программ/i.test(r) ? 'code' : 'pen' }))
   const author = get<{ name: string }>('SELECT name FROM users WHERE id = ?', userId)!
 
-  const resultId = createPublication(userId, id, () => {
+  const resultId = createPublicationWithBilling(userId, id, () => {
     run(
       `INSERT INTO opportunities (id, kind, title, subtitle, meta, city, lat, lng, card, about, cta, image, hero, topic,
          date, time, place, organizer, stage, online, roles, conditions, author_id)
@@ -104,7 +105,8 @@ opportunitiesRouter.post('/', requireAuth, (req, res) => {
       projectId, d.title, d.description.split('.')[0], d.cover ?? null, 'team', `Ищем: ${d.roles.join(', ')}`, userId, id,
     )
     run('INSERT INTO project_members (project_id, user_id) VALUES (?, ?)', projectId, userId)
-  }, requestKey ? { key: requestKey, payloadHash: publicationPayloadHash(d), legacyPayloadHash: publicationPayloadHash({ ...d, ...(typeof req.body.campusId === 'string' && req.body.campusId.trim() ? { campusId: req.body.campusId.trim() } : {}) }) } : undefined)
+    bindCampusPublication(userId, id, d.campusId)
+  }, undefined, requestKey ? { key: requestKey, payloadHash: publicationPayloadHash(d), neutralPayloadHash: publicationPayloadHash(Object.fromEntries(Object.entries(d).filter(([field]) => field !== 'campusId'))) } : undefined)
 
   res.status(201).json({ item: opportunityOf(get<OpportunityRow>('SELECT * FROM opportunities WHERE id = ?', resultId)!, userId) })
 })

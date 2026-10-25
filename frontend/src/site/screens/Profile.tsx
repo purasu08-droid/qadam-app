@@ -5,6 +5,7 @@ import { api, type Profile as ProfileT } from '../api'
 import { CITIES, OTHER_CITIES, type Opportunity } from '../data'
 import { useApi, useSite } from '../state'
 import { Avatar, Cover, KindBadge } from '../components/ui'
+import { AccountBilling } from '../components/Billing'
 import { useI18n } from '../i18n'
 import { useIsDesktop } from '../../useIsDesktop'
 
@@ -110,6 +111,11 @@ function ProfileView() {
           <div><dt>{t('Сохранённое')}</dt><dd>{activity.data ? activity.data.saved.length.toLocaleString(locale) : '—'}</dd></div>
         </>}
       </dl>
+
+      {desktop && self && <>
+        <AccountBilling />
+        <section className="panel billing-summary" aria-label={t('Мой Qadam Campus')}><div className="row between"><div><h2>Qadam Campus</h2><p className="muted small">{t('Подтверждение студенческого статуса и пространство твоего вуза.')}</p></div><Link to="/campus" className="btn outline-purple">{t('Открыть Campus')} <ArrowRight size={17} /></Link></div></section>
+      </>}
 
       <div className="pf-grid">
         <aside className="panel pf-about">

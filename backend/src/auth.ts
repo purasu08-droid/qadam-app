@@ -2,7 +2,7 @@ import { createHash, randomBytes, scrypt, scryptSync, timingSafeEqual } from 'no
 import type { NextFunction, Request, Response } from 'express'
 import { config } from './config.js'
 import { get, now, run } from './db.js'
-import { isRetiredDemoUser } from './legacy-data.js'
+import { campusDemoEnabled, campusDemoIdentity } from './campus-demo-policy.js'
 
 export const SESSION_COOKIE = 'qadam_session'
 const SESSION_DAYS = 30
@@ -75,7 +75,8 @@ export function loadSession(req: Request, res: Response, next: NextFunction) {
   const token = req.cookies?.[SESSION_COOKIE]
   if (token) {
     const s = get<{ user_id: string }>('SELECT user_id FROM sessions WHERE token_hash = ? AND expires_at > ?', sha256(token), now())
-    if (s && isRetiredDemoUser(s.user_id)) {
+    if (s && campusDemoIdentity(s.user_id) && !campusDemoEnabled()) {
+      run('DELETE FROM sessions WHERE token_hash = ?', sha256(token))
       res.clearCookie(SESSION_COOKIE, { path: '/' })
     } else if (s) req.userId = s.user_id
   }

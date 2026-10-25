@@ -1,0 +1,28 @@
+.site .billing-summary { padding: 22px 20px; display: flex; flex-direction: column; gap: 12px; }
+.site .billing-summary h2 { font-size: 22px; display: flex; align-items: center; gap: 8px; }
+.site .billing-summary > .row { flex-wrap: wrap; }
+.site .billing-price { font-size: 23px; font-weight: 750; color: var(--lime); }
+.site .billing-pilot { display: flex; align-items: flex-start; gap: 10px; background: rgba(214, 247, 74, .07); border: 1px solid rgba(214, 247, 74, .25); border-radius: 10px; padding: 12px; color: #e4f7a5; }
+.site .billing-pilot svg { flex-shrink: 0; margin-top: 2px; }
+.site .billing-pilot p { margin-top: 4px; font-size: 14px; }
+.site .account-billing { margin-top: 22px; }
+.site .billing-campus-credit { padding-top: 12px; border-top: 1px solid var(--line); }
+.site .billing-campus-credit h3 { font-size: 17px; }
+.site .billing-campus-credit ul { padding-left: 20px; margin: 8px 0; }
+.site .promotion-options { display: flex; flex-direction: column; gap: 8px; border: 0; padding: 0; margin: 0; }
+.site .promotion-options label { display: flex; align-items: center; gap: 10px; padding: 12px; min-height: 60px; border: 1px solid var(--line-2); border-radius: 10px; cursor: pointer; }
+.site .promotion-options label:has(input:checked) { border-color: var(--lime); background: rgba(214, 247, 74, .05); }
+.site .promotion-options input { accent-color: var(--lime); width: 18px; height: 18px; flex-shrink: 0; }
+.site .promotion-options span { display: flex; flex-direction: column; gap: 4px; }
+.site .promotion-options small { color: var(--dim); }
+.site .pricing-teaser { padding: 28px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.site .landing .pricing-teaser h2 { font-size: 30px; }
+.site .foot a { color: var(--purple); }
+@media (max-width: 1023px) { .site .pricing-teaser { align-items: flex-start; flex-direction: column; } }
+@media (max-width: 560px) {
+  .site .billing-summary { padding: 18px 14px; }
+  .site .billing-summary h2 { font-size: 21px; }
+  .site .billing-price { font-size: 21px; }
+  .site .pricing-teaser { padding: 20px 16px; }
+  .site .pricing-teaser .btn { white-space: normal; min-height: 46px; height: auto; padding: 12px 14px; }
+}

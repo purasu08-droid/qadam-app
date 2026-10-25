@@ -5,10 +5,13 @@ import { CITIES, FAQ, KIND_ORDER, KINDS, OTHER_CITIES } from '../data'
 import { useSite } from '../state'
 import { IconTile, OppCard, kindStyle } from '../components/ui'
 import SiteMap from '../components/SiteMap'
+import { PricingTeaser } from '../components/Billing'
 import { useTheme } from '../theme'
 import { useI18n } from '../i18n'
+import { useIsDesktop } from '../../useIsDesktop'
 
 export default function Landing() {
+  const desktop = useIsDesktop()
   const { t } = useI18n()
   const nav = useNavigate()
   const { hash } = useLocation()
@@ -149,6 +152,8 @@ export default function Landing() {
         </div>
       </section>
 
+      {desktop && <PricingTeaser />}
+
       <section id="faq" className="sec">
         <span className="eyebrow">03 / FAQ</span>
         <h2>{t("Частые вопросы")}</h2>
@@ -167,6 +172,7 @@ export default function Landing() {
 
       <footer className="foot">
         <span>{t("© 2026 QADAM · Казахстан")}</span>
+        {desktop && <Link to="/pricing">{t("Тарифы и Qadam Campus")}</Link>}
         <span className="muted">{t("Маленькие шаги, большие перемены")}</span>
       </footer>
     </div>

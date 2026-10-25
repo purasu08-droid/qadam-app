@@ -5,14 +5,19 @@ import { useSite } from '../state'
 import { PixelPin } from '../components/Pixel'
 import { siteAuthReturnPath } from '../auth-utils'
 import { isAbortError } from '../api'
+import CampusDemoEntry from '../components/CampusDemoEntry'
 import { useI18n } from '../i18n'
+import { useIsDesktop } from '../../useIsDesktop'
 
 export default function SiteAuth() {
+  const desktop = useIsDesktop()
   const { t } = useI18n()
   const { state, pathname } = useLocation()
   const from: unknown = state && typeof state === 'object' && 'from' in state ? state.from : undefined
-  const returnTo = siteAuthReturnPath(from, pathname)
+  const requestedReturn = siteAuthReturnPath(from, pathname)
+  const returnTo = !desktop && /^\/(?:campus|pricing)(?:[/?#]|$)/i.test(requestedReturn) ? '/account/profile' : requestedReturn
   const { user, ready, authError, authBusy, authOptions, retryAuth, signIn, signUp, demoSignIn } = useSite()
+  const [demoDestination, setDemoDestination] = useState<string | null>(null)
   const [mode, setMode] = useState<'login' | 'register'>('login')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -30,6 +35,7 @@ export default function SiteAuth() {
   const run = async (fn: () => Promise<void>) => {
     if (inFlight.current || authBusy) return
     inFlight.current = true
+    setDemoDestination(null)
     setError('')
     setBusy(true)
     try {
@@ -58,7 +64,7 @@ export default function SiteAuth() {
     setError('')
   }
 
-  if (user) return <Navigate to={returnTo} replace />
+  if (user) return <Navigate to={desktop ? demoDestination ?? returnTo : returnTo} replace />
   if (!ready && !authError) return <div className="page" role="status">{t('Проверяем вход…')}</div>
 
   return (
@@ -116,6 +122,7 @@ export default function SiteAuth() {
           <button type="button" className="btn outline dblock lg" disabled={busy} onClick={() => { void run(demoSignIn) }}>
             {t('Войти в демо-аккаунт')}
           </button></>}
+          {desktop && <CampusDemoEntry disabled={localBusy} onDestination={setDemoDestination} />}
         </form>
       </div>
     </div>

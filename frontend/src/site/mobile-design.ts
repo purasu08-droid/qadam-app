@@ -1,4 +1,4 @@
-// API account pages keep their presentation at every width.
+// API account pages and desktop-only pricing/Campus keep their own presentation.
 export function usesOriginalMobileDesign(pathname: string) {
-  return pathname !== '/account' && !pathname.startsWith('/account/')
+  return !/^\/(?:account|campus|pricing)(?:\/|$)/i.test(pathname)
 }

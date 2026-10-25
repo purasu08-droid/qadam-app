@@ -6,14 +6,15 @@ import { get, newId, run } from '../db.js'
 import { profileOf, type UserRow } from '../models.js'
 import { DEMO_EMAIL, DEMO_PASSWORD, USERS } from '../seed-data.js'
 import { authRateLimit } from '../rate-limit.js'
-import { isRetiredDemoUser } from '../legacy-data.js'
+import { campusDemoEnabled, campusDemoIdentity } from '../campus-demo-policy.js'
+import { bootstrapCampusDemo } from '../campus-demo.js'
 
 export const authRouter = Router()
-authRouter.use(['/register', '/login', '/demo'], authRateLimit())
+authRouter.use(['/register', '/login', '/demo', '/campus-demo'], authRateLimit())
 const demoEmails = new Set(USERS.map((user) => user.email.toLowerCase()))
 authRouter.get('/options', (_req, res) => {
   res.setHeader('Cache-Control', 'no-store')
-  res.json({ demoLogin: config.allowDemoLogin && Boolean(get('SELECT 1 FROM users WHERE email=?', DEMO_EMAIL)) })
+  res.json({ demoLogin: config.allowDemoLogin && Boolean(get('SELECT 1 FROM users WHERE email=?', DEMO_EMAIL)), campusDemoLogin: campusDemoEnabled() })
 })
 
 const Register = z.object({
@@ -46,7 +47,7 @@ authRouter.post('/register', async (req, res) => {
 authRouter.post('/login', async (req, res) => {
   const body = Login.parse(req.body)
   const user = get<UserRow>('SELECT * FROM users WHERE email = ?', body.email)
-  if (!user || isRetiredDemoUser(user.id) || !await verifyPasswordAsync(body.password, user.password_hash))
+  if (!user || campusDemoIdentity(user.id) || !await verifyPasswordAsync(body.password, user.password_hash))
     return void res.status(401).json({ error: 'Неверный email или пароль' })
   // Existing databases may contain the public seed credentials even when automatic seeding is off.
   // A changed password on the same email remains usable; only the verified public credential is blocked.
@@ -63,6 +64,14 @@ authRouter.post('/demo', (_req, res) => {
   if (!user) return void res.status(503).json({ error: 'Обычный демо-аккаунт недоступен' })
   startSession(res, user.id)
   res.json({ user: profileOf(user, true) })
+})
+
+authRouter.post('/campus-demo', (req, res) => {
+  if (!campusDemoEnabled()) return void res.status(403).json({ error: 'Демо-кабинет Campus выключен', code: 'CAMPUS_DEMO_DISABLED' })
+  z.object({}).strict().parse(req.body ?? {})
+  const { user, campus } = bootstrapCampusDemo()
+  startSession(res, user.id)
+  res.json({ user: profileOf(user, true), campus })
 })
 
 authRouter.post('/logout', (req, res) => {

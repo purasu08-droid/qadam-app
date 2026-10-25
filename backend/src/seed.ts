@@ -4,7 +4,7 @@ import { db, get, newId, run, tx } from './db.js'
 import { hasArchivedFeatureData } from './legacy-data.js'
 import { CONVERSATIONS, DEMO_PASSWORD, DEMO_STATE, OPPORTUNITIES, PROJECTS, USERS } from './seed-data.js'
 
-const TABLES = ['publication_requests', 'messages', 'conversation_members', 'conversations', 'project_members', 'projects', 'saved', 'attendance', 'applications', 'opportunities', 'sessions', 'users']
+const TABLES = ['publication_requests', 'campus_demo_objects', 'campus_demo_identities', 'campus_demo_registry', 'campus_grant_requests', 'campus_audit', 'campus_publications', 'campus_students', 'campus_admins', 'billing_publication_requests', 'billing_usage', 'billing_campus_grants', 'billing_student_verifications', 'campuses', 'messages', 'conversation_members', 'conversations', 'project_members', 'projects', 'saved', 'attendance', 'applications', 'opportunities', 'sessions', 'users']
 
 // ISO-время для «day дней назад в ЧЧ:ММ» по локальному времени сервера.
 function at(day: number, hhmm: string) {
@@ -17,9 +17,8 @@ function at(day: number, hhmm: string) {
 
 export function seed({ reset = false } = {}) {
   if (!reset && get('SELECT 1 FROM users LIMIT 1')) return false
-  if (reset && hasArchivedFeatureData()) throw new Error('Сброс остановлен: база содержит архивные данные отключённых функций. Сохрани её и выбери отдельный DB_PATH для демо.')
-
   tx(() => {
+    if (reset && hasArchivedFeatureData()) throw new Error('Сброс остановлен: база содержит защищённые данные публикаций или Campus. Сохрани её и выбери отдельный DB_PATH для демо.')
     if (reset) for (const t of TABLES) db.exec(`DELETE FROM ${t}`)
 
     const ids = new Map<string, string>()
@@ -86,7 +85,7 @@ export function seed({ reset = false } = {}) {
     for (const o of DEMO_STATE.saved) run('INSERT INTO saved (user_id, opportunity_id) VALUES (?, ?)', demo, o)
     for (const a of DEMO_STATE.applications)
       run('INSERT INTO applications (id, opportunity_id, user_id, role, message) VALUES (?, ?, ?, ?, ?)', newId('a'), a.opportunity, demo, a.role, a.message)
-  })
+  }, 'IMMEDIATE')
   return true
 }
 

@@ -132,6 +132,7 @@ export type ProjectItem = {
 }
 
 export type NewPublication = {
+  campusId?: string
   kind: Kind
   title: string
   description: string

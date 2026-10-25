@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react'
 import { localeFor, normalizeLanguage, translateMessage, type Language, type MessageParams } from './i18n-core'
 import { common } from './locales/common'
+import { campus } from './locales/campus'
 import { forms } from './locales/forms'
 import { community } from './locales/community'
 import { errors } from './locales/errors'
@@ -8,7 +9,7 @@ import { formatLocalizedDate } from './i18n-date'
 
 export { localeFor, normalizeLanguage } from './i18n-core'
 export type { Language, TranslationCatalog, MessageParams } from './i18n-core'
-export const translations = { ...community, ...forms, ...common, ...errors }
+export const translations = { ...community, ...forms, ...campus, ...common, ...errors }
 const STORAGE_KEY = 'qadam.site.language'
 const listeners = new Set<() => void>()
 let initialized = false

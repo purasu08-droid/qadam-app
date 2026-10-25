@@ -15,7 +15,7 @@ test('every restored mobile screen, component, style and store matches the suppl
 })
 
 test('phones use the exact archive routes while desktop keeps the existing site', () => {
-  for (const path of ['/', '/welcome', '/signin', '/SIGNIN', '/places', '/feed', '/messages', '/messages/chat_1', '/profile', '/add', '/unknown', '/accounting', '/old-page']) {
+  for (const path of ['/', '/welcome', '/signin', '/SIGNIN', '/places', '/feed', '/messages', '/messages/chat_1', '/profile', '/add', '/unknown', '/accounting', '/old-page', '/pricing', '/pricing/', '/campus', '/campus/campus_1', '/campus/signin', '/campus/account']) {
     assert.equal(usesArchiveMobile(path, false), true, path)
     assert.equal(usesArchiveMobile(path, true), false, path)
   }

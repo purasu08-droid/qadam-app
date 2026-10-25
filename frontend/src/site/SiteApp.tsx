@@ -6,6 +6,7 @@ import { useSite } from './state'
 import { legacyTarget } from './routes'
 import '../site.css'
 import '../responsive.css'
+import '../billing-ui.css'
 import '../theme.css'
 import { useI18n } from './i18n'
 import { usesOriginalMobileDesign } from './mobile-design'
@@ -22,9 +23,12 @@ const Create = lazy(() => import('./screens/Create'))
 const Chats = lazy(() => import('./screens/Chats'))
 const Profile = lazy(() => import('./screens/Profile'))
 const MyProjects = lazy(() => import('./screens/MyProjects'))
+const Pricing = lazy(() => import('./screens/Pricing'))
+const Campus = lazy(() => import('./screens/Campus'))
 
 export default function SiteApp() {
   const { t } = useI18n()
+  const desktop = useIsDesktop()
   const { pathname } = useLocation()
   useEffect(() => { window.scrollTo(0, 0) }, [pathname])
   return (
@@ -38,6 +42,13 @@ export default function SiteApp() {
               <Route path="/" element={<Landing />} />
               <Route path="/signin" element={<SiteAuth />} />
               <Route path="/map" element={<MapPage />} />
+              {desktop && <>
+                <Route path="/pricing" element={<Pricing />} />
+                <Route path="/campus/signin" element={<SiteAuth />} />
+                <Route path="/campus/account" element={<Private><Profile /></Private>} />
+                <Route path="/campus" element={<Private><Campus /></Private>} />
+                <Route path="/campus/:id" element={<Private><Campus /></Private>} />
+              </>}
               <Route path="/account/signin" element={<SiteAuth />} />
               <Route path="/account/profile" element={<Private><Profile /></Private>} />
               <Route path="/p/:id" element={<Detail />} />

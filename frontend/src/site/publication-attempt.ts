@@ -4,6 +4,18 @@ export function isPublicationReplay(previous: PublicationAttempt | null, payload
 
 export type PublicationAttempt = { payload: string; key: string }
 
+export function incompatiblePublicationAttempt(attempt: PublicationAttempt | null, desktop: boolean, campusId?: string) {
+  if (!attempt) return false
+  try {
+    const previous: unknown = JSON.parse(attempt.payload)
+    if (!previous || typeof previous !== 'object' || Array.isArray(previous)) return true
+    // Changing viewport must not convert an unresolved request between a Campus
+    // and personal publication in either direction without an explicit reset.
+    const originalCampus = 'campusId' in previous ? previous.campusId : undefined
+    return originalCampus !== (desktop ? campusId : undefined)
+  } catch { return true }
+}
+
 export function newPublicationKey() {
   if (typeof crypto.randomUUID === 'function') return crypto.randomUUID()
   return Array.from(crypto.getRandomValues(new Uint8Array(16)), (byte) => byte.toString(16).padStart(2, '0')).join('')

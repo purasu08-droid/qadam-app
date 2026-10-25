@@ -1,0 +1,27 @@
+.site .campus-demo-entry { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; min-width: 0; padding: 24px; margin: 24px 0; border: 1px solid rgba(162,117,255,.4); border-radius: 16px; background: linear-gradient(115deg, rgba(162,117,255,.09), rgba(214,247,74,.025)), var(--panel); }
+.site .campus-demo-symbol { display: grid; place-items: center; flex: none; width: 46px; height: 46px; border-radius: 12px; color: var(--purple); background: rgba(162,117,255,.12); }
+.site .campus-demo-copy { flex: 1 1 240px; min-width: 0; }
+.site .campus-demo-copy .eyebrow { color: var(--purple); font-size: 10px; }
+.site .campus-demo-copy h3 { font-size: 18px; line-height: 1.4; margin: 7px 0; overflow-wrap: anywhere; }
+.site .campus-demo-copy p, .site .campus-demo-options { color: var(--dim); font-size: 12px; line-height: 1.7; overflow-wrap: anywhere; }
+.site .campus-demo-copy .campus-demo-switch { color: var(--lime); margin-top: 7px; }
+.site .campus-demo-actions { flex: 0 1 290px; min-width: 0; }
+.site .campus-demo-actions .btn { width: 100%; min-height: 46px; white-space: normal; text-align: center; }
+.site .campus-demo-actions .err { margin-top: 10px; font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.site .campus-demo-options { margin: 18px 0; }
+.site .campus-demo-options button { display: block; margin-top: 6px; font-size: 12px; }
+.site .auth-form .campus-demo-entry { padding: 18px; gap: 12px; margin: 18px 0 0; }
+.site .auth-form .campus-demo-symbol { width: 34px; height: 34px; border-radius: 9px; }
+.site .auth-form .campus-demo-copy { flex-basis: 180px; }
+.site .auth-form .campus-demo-copy h3 { font-size: 16px; }
+.site .auth-form .campus-demo-actions { flex: 1 1 100%; }
+.site .campus-demo-banner { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 22px; padding: 17px 20px; color: var(--text); background: rgba(162,117,255,.08); border: 1px solid rgba(162,117,255,.4); border-radius: 12px; font-size: 13px; line-height: 1.7; overflow-wrap: anywhere; }
+.site .campus-demo-banner > svg { flex: none; color: var(--purple); margin-top: 2px; }
+.site .campus-demo-banner strong { color: var(--purple); }
+@media (max-width: 600px) {
+  .site .campus-demo-entry { padding: 18px; gap: 12px; }
+  .site .campus-demo-copy { flex-basis: calc(100% - 64px); }
+  .site .campus-demo-copy h3 { font-size: 16px; }
+  .site .campus-demo-actions { flex: 1 1 100%; }
+  .site .campus-demo-banner { padding: 15px; font-size: 12px; }
+}

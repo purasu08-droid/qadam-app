@@ -12,7 +12,11 @@
     "start": "node dist/index.js",
     "seed": "tsx src/seed.ts --reset",
     "typecheck": "tsc -p . --noEmit",
-    "test": "node --import tsx --test test/*.test.ts"
+    "test": "node --import tsx --test test/*.test.ts",
+    "billing:student": "tsx src/billing-admin.ts student",
+    "billing:grant": "tsx src/billing-admin.ts grant",
+    "campus:create": "tsx src/campus-admin.ts create",
+    "campus:admin": "tsx src/campus-admin.ts admin"
   },
   "dependencies": {
     "cookie-parser": "1.4.7",

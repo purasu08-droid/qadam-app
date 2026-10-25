@@ -6,12 +6,17 @@ import { ZodError } from 'zod'
 import { loadSession } from './auth.js'
 import { config } from './config.js'
 import { PublicationRequestError } from './publication-requests.js'
+import { backfillPublicationUsage, BillingError } from './billing.js'
+import { billingRouter } from './routes/billing.js'
 import { authRouter } from './routes/auth.js'
 import { conversationsRouter } from './routes/conversations.js'
 import { opportunitiesRouter } from './routes/opportunities.js'
 import { projectsRouter, usersRouter } from './routes/users.js'
+import { campusRouter } from './routes/campus.js'
+import { CampusError } from './campus.js'
 
 export function createApp() {
+  backfillPublicationUsage()
   const app = express()
   app.disable('x-powered-by')
   app.use(express.json({ limit: '100kb' }))
@@ -24,6 +29,8 @@ export function createApp() {
   app.use('/api/conversations', conversationsRouter)
   app.use('/api/users', usersRouter)
   app.use('/api/projects', projectsRouter)
+  app.use('/api/billing', billingRouter)
+  app.use('/api/campus', campusRouter)
   app.use('/api', (_req, res) => res.status(404).json({ error: 'Нет такого метода API' }))
 
   // Продакшен: тот же сервер раздаёт собранный фронтенд (npm run build в корне).
@@ -34,6 +41,8 @@ export function createApp() {
 
   const onError: ErrorRequestHandler = (err, _req, res, _next) => {
     if (err instanceof PublicationRequestError) return void res.status(err.status).json({ error: err.message, code: err.code })
+    if (err instanceof CampusError) return void res.status(err.status).json({ error: err.message, code: err.code })
+    if (err instanceof BillingError) return void res.status(err.status).json({ error: err.message, code: err.code, ...(err.quote ? { quote: err.quote } : {}) })
     if (err instanceof ZodError) {
       const first = err.issues[0]
       return void res.status(400).json({ error: first?.message ?? 'Некорректные данные', issues: err.issues })

@@ -133,4 +133,7 @@ export const community: TranslationCatalog = {
   'Пользователь не найден': { kk: 'Пайдаланушы табылмады', en: 'User not found' },
   'Диалог не найден': { kk: 'Диалог табылмады', en: 'Conversation not found' },
   'Сообщение не найдено в этом диалоге': { kk: 'Хабарлама осы диалогта табылмады', en: 'Message not found in this conversation' },
+
+  'Публикация Qadam Campus': { kk: 'Qadam Campus жарияланымы', en: 'Qadam Campus publication' },
+  'Публикация скрыта администратором вуза и не видна на карте. Причина: {reason}. По вопросам обратись в свой вуз.': { kk: 'Жарияланымды университет әкімшісі жасырған, ол картада көрінбейді. Себебі: {reason}. Сұрақтар бойынша өз университетіңе хабарлас.', en: 'The university administrator has hidden this publication from the map. Reason: {reason}. Contact your university with any questions.' },
 }

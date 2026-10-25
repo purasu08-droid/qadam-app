@@ -1,6 +1,6 @@
 // Строки БД → JSON для фронтенда. Формы совпадают с типами в frontend/src/site/api.ts.
 import { all, get } from './db.js'
-import { canReadOpportunity } from './legacy-data.js'
+import { canReadOpportunity, publicationCampusInfo } from './campus.js'
 
 export type UserRow = {
   id: string
@@ -80,7 +80,7 @@ export function profileOf(u: UserRow, self: boolean) {
   }
 }
 
-export function opportunityOf(o: OpportunityRow, _viewerId?: string) {
+export function opportunityOf(o: OpportunityRow, viewerId?: string) {
   return {
     id: o.id,
     kind: o.kind,
@@ -106,6 +106,7 @@ export function opportunityOf(o: OpportunityRow, _viewerId?: string) {
     conditions: opt(o.conditions),
     author: findPerson(o.author_id),
     createdAt: o.created_at,
+    ...publicationCampusInfo(o.id, viewerId),
   }
 }
 

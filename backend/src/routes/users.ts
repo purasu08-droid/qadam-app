@@ -4,12 +4,12 @@ import { me, param, requireAuth } from '../auth.js'
 import { all, get, run } from '../db.js'
 import { findPerson, opportunitiesByIds, opportunityOf, profileOf, type OpportunityRow, type UserRow } from '../models.js'
 import { findDirect } from './conversations.js'
-import { publicOpportunityVisibility } from '../legacy-data.js'
+import { publicCampusVisibility } from '../campus.js'
 
 export const usersRouter = Router()
 
 function profileResponse(user: UserRow, self: boolean) {
-  const publications = all<OpportunityRow>(`SELECT * FROM opportunities WHERE author_id = ? ${self ? '' : `AND ${publicOpportunityVisibility()}`} ORDER BY created_at DESC`, user.id).map((o) => opportunityOf(o, self ? user.id : undefined))
+  const publications = all<OpportunityRow>(`SELECT * FROM opportunities WHERE author_id = ? ${self ? '' : `AND ${publicCampusVisibility()}`} ORDER BY created_at DESC`, user.id).map((o) => opportunityOf(o, self ? user.id : undefined))
   return { profile: profileOf(user, self), publications }
 }
 
