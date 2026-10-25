@@ -1,0 +1,35 @@
+# зависимости и сборка
+node_modules/
+dist/
+*.tsbuildinfo
+
+# локальные переменные окружения (ключи не коммитим)
+.env
+.env.local
+
+# системное
+.DS_Store
+*.log
+
+# база SQLite бэкенда
+backend/data/
+
+# private local settings and generated files
+.env.*
+!.env.example
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.pem
+*.key
+runtime/
+coverage/
+Thumbs.db
+Desktop.ini
+
+# local reference copies and attached source documents
+/qadam-main/
+/*.pdf

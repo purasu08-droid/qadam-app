@@ -1,0 +1,2 @@
+# Preserve the supplied mobile source byte for byte on every platform.
+/frontend/src/original-mobile/** -text

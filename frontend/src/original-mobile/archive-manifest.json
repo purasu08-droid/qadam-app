@@ -1,0 +1,86 @@
+{
+  "sourceArchive": "qadam-main.zip",
+  "archiveSha256": "2f9d8e01cd84467a9502de8c21c9f4938a813c096ce804dbe52343268f116d5e",
+  "files": [
+    {
+      "path": "screens/Add.tsx",
+      "sha256": "26722b5821b9b0515aee3ad1a3f6c3994d3011a0ccfdbcaa22dd0e608b9370c5"
+    },
+    {
+      "path": "screens/Chat.tsx",
+      "sha256": "b0ede1fc3f7d344f4997197cb3c1038fbf0144d8940fe653a622156605af18d6"
+    },
+    {
+      "path": "screens/Feed.tsx",
+      "sha256": "783ca4021e8a9af2127ad89848c972652239371751347d9d67bd8ce0e5a10c04"
+    },
+    {
+      "path": "screens/Messages.tsx",
+      "sha256": "b335fa2318166f9c5076567c2c4a9cd19c9c95a7684a08ede18c587eafdb14e8"
+    },
+    {
+      "path": "screens/Places.tsx",
+      "sha256": "82db3ea3d1e43d13b60ab80fd3cdfdb99c0861a71248cfea5f376e5deae93de2"
+    },
+    {
+      "path": "screens/Profile.tsx",
+      "sha256": "0506d7c5e2adb51dc35f4acb2ca2212c37594cc19b47b078a9657c2c9eec19e0"
+    },
+    {
+      "path": "screens/SignIn.tsx",
+      "sha256": "ef378acbf35e6567da7893fcc566655a16a15fd601a2f55bc0d7ea25f9f77e2f"
+    },
+    {
+      "path": "screens/Splash.tsx",
+      "sha256": "fa64c07010399f37de734888436e387f51f25c80b738b7518781c44479b60fc5"
+    },
+    {
+      "path": "screens/Welcome.tsx",
+      "sha256": "ca12213ff208d9988a6f94e287533fd1eb31ca7149b8b444107437016a5b2a81"
+    },
+    {
+      "path": "components/Avatar.tsx",
+      "sha256": "33ed7c0cb201f9fe2a78c4fe854bd44c412d22ab8a5e44d28583c4fcf288fb56"
+    },
+    {
+      "path": "components/BottomNav.tsx",
+      "sha256": "789d1ecb2fd0141e1bbd507267f0e637c4b7c37d4cff9002e8612baed3bee05a"
+    },
+    {
+      "path": "components/FilterSheet.tsx",
+      "sha256": "8906734b32b85dd6e0e9fb257345776aada50b872ce64fcefd9be1906b8bc964"
+    },
+    {
+      "path": "components/Logo.tsx",
+      "sha256": "7aa1503090af89a9f52674d44bf10b487203e70afaf89cb5bc5387111709bdf8"
+    },
+    {
+      "path": "components/MapView.tsx",
+      "sha256": "75238057121b77a647f0a77b7889fa359603a721cc52543bd12eb2cac2d5bad2"
+    },
+    {
+      "path": "components/ProjectCard.tsx",
+      "sha256": "c2a1895badbc54f8d45c64455ce6dd2bb51c1669d217f86cfce00491e3ce4854"
+    },
+    {
+      "path": "components/Segmented.tsx",
+      "sha256": "8f04330884bac89eaa73e09d8ce768e13056e3e47eb54c6a6e9e314e9d63d5b0"
+    },
+    {
+      "path": "data/mock.ts",
+      "sha256": "7d42531a7030c8edf25c12bc414a379996fdf59a738b5e8b6af37c864031e7d0"
+    },
+    {
+      "path": "data/game.ts",
+      "sha256": "5cffec5aabde9fce6af3a7be5d4f61feee575c45d5beced257d7c442d2cfbf39"
+    },
+    {
+      "path": "store.tsx",
+      "sha256": "cf2850b9fb08407494329c318a3797f880c9befdd64f5779cfec8b5d5ae26762"
+    },
+    {
+      "path": "styles.css",
+      "sha256": "412790868faef47caa496b898b48e5f724de1ebc5feed307cf189323104748c3"
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+.original-mobile {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+  color-scheme: light;
+  line-height: normal;
+  font-synthesis: initial;
+}
+.original-mobile > .device { flex: 1; min-height: 0; height: auto; }
+.original-mobile > .device > .screen { max-height: 100%; }
+
+/* Requested category layout; the archived screen and stylesheet remain intact. */
+.original-mobile .screen > .places:not(.is-map) {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding-bottom: 0;
+}
+.original-mobile .places:not(.is-map) > :is(.top-bar, .px) { flex-shrink: 0; }
+.original-mobile .places:not(.is-map) .segmented { margin-bottom: 36px; }
+.original-mobile .category-stack { flex: 1 0 auto; }
+.original-mobile .category-stack .category-band {
+  flex-shrink: 0;
+  transform: translateY(0);
+  transition: transform .2s ease;
+  touch-action: pan-y pinch-zoom;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.original-mobile .category-stack .category-band:is(:hover, :active, :focus-visible) {
+  transform: translateY(-4px);
+}
+.original-mobile .category-stack .category-band:focus-visible { outline: 2px solid currentColor; outline-offset: -4px; }
+.original-mobile .category-stack .category-band:last-child {
+  flex-grow: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 30px;
+  align-content: start;
+  padding-bottom: max(90px, calc(76px + env(safe-area-inset-bottom, 0px)));
+  box-shadow: 0 4px 0 #141418;
+}
+.original-mobile .places:not(.is-map) + .bottom-nav {
+  margin-top: -76px;
+  bottom: max(14px, env(safe-area-inset-bottom, 0px));
+}
+@media (prefers-reduced-motion: reduce) {
+  .original-mobile .category-stack .category-band { transition: none; }
+}

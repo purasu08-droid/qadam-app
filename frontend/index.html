@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
+    <meta name="theme-color" content="#0a0912" />
+    <style>
+      html { color-scheme: dark; background: #0a0912; color: #f4f3f9; }
+      html[data-theme='light'] { color-scheme: light; background: #f6f7f2; color: #20251c; }
+    </style>
+    <script>
+      (() => {
+        let theme = 'dark'
+        try { if (localStorage.getItem('qadam.site.theme') === 'light') theme = 'light' } catch {}
+        document.documentElement.setAttribute('data-theme', theme)
+        let language = 'ru'
+        try { const saved = localStorage.getItem('qadam.site.language'); if (saved === 'kk' || saved === 'en') language = saved } catch {}
+        document.documentElement.lang = language
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', theme === 'light' ? '#f6f7f2' : '#0a0912')
+      })()
+    </script>
+    <meta name="description" content="QADAM — находи проекты, единомышленников и события рядом. Сделай первый шаг вместе с командой." />
+    <title>QADAM</title>
+    <link rel="icon" href="/pin.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Onest:wght@400;500;600;700;800&family=Caveat:wght@500;700&family=Russo+One&family=Jersey+10&family=Tiny5&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
