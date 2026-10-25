@@ -4,6 +4,7 @@ export type Theme = 'dark' | 'light'
 const STORAGE_KEY = 'qadam.site.theme'
 const listeners = new Set<() => void>()
 let initialized = false
+let listening = false
 const normalizeTheme = (value: string | null): Theme => value === 'light' ? 'light' : 'dark'
 
 function getTheme(): Theme {
@@ -24,7 +25,9 @@ function syncTheme(event: StorageEvent) {
 }
 
 function subscribe(listener: () => void) {
-  if (listeners.size === 0) window.addEventListener('storage', syncTheme)
+  // The archive has no theme subscribers, but preferences can still change in
+  // another tab. Keep this singleton listener for the lifetime of the page.
+  if (!listening) { window.addEventListener('storage', syncTheme); listening = true }
   listeners.add(listener)
   if (!initialized) {
     initialized = true
@@ -33,7 +36,6 @@ function subscribe(listener: () => void) {
   }
   return () => {
     listeners.delete(listener)
-    if (listeners.size === 0) window.removeEventListener('storage', syncTheme)
   }
 }
 

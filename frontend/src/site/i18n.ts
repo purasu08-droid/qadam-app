@@ -12,6 +12,7 @@ export const translations = { ...community, ...forms, ...common, ...errors }
 const STORAGE_KEY = 'qadam.site.language'
 const listeners = new Set<() => void>()
 let initialized = false
+let listening = false
 
 export function getLanguage(): Language {
   return normalizeLanguage(typeof document === 'undefined' ? null : document.documentElement.lang)
@@ -41,7 +42,9 @@ function syncLanguage(event: StorageEvent) {
 }
 
 function subscribe(listener: () => void) {
-  if (listeners.size === 0) window.addEventListener('storage', syncLanguage)
+  // Original mobile screens do not subscribe to this store. Continue receiving
+  // other tabs' choices while those screens replace the server interface.
+  if (!listening) { window.addEventListener('storage', syncLanguage); listening = true }
   listeners.add(listener)
   if (!initialized) {
     initialized = true
@@ -49,7 +52,6 @@ function subscribe(listener: () => void) {
   }
   return () => {
     listeners.delete(listener)
-    if (listeners.size === 0) window.removeEventListener('storage', syncLanguage)
   }
 }
 
